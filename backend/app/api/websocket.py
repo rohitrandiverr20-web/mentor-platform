@@ -2,6 +2,10 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends
 from typing import Dict, List
 from uuid import UUID
 import json
+from app.models.message import Message
+from uuid import UUID
+from app.core.database import get_db
+from sqlalchemy.orm import Session as DbSession
 
 router = APIRouter(tags=["WebSockets"])
 
@@ -33,10 +37,13 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 @router.websocket("/ws/session/{session_id}")
-async def websocket_endpoint(
+
+async def websocket_endpoint( 
     websocket: WebSocket, 
     session_id: UUID, 
-    token: str = None
+    user_id: UUID, 
+    db: DbSession = Depends(get_db)
+    
 ):
     """
     Real-time code collaboration endpoint.
